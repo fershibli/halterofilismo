@@ -1,26 +1,5 @@
 import msvcrt, os, time, thread, socket
 
-socketServidor=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-socketCliente=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-IP_visivel=socket.gethostbyname(socket.gethostname())
-print ('\n Seu IP: '+str(IP_visivel)+'\n\nCaso duvide do IP acima, verifique as suas conexoes \ne se nao esta usando programas como HAMACHI.\n')
-porta1=input("Porta de Entrada(por exemplo 20123): ")
-porta2=input("Porta de Saida(por exemplo 20124): ")
-IP_amigo=raw_input('\nQual eh o IP do seu amigo?\n-') #"0.0.0.0" ou "" ou socket.INADDR_ANY na porta 999(deve ser so um exemplo) escuta todos os IPs
-socketServidor.bind((IP_amigo, porta1))
-raw_input('Aperte [ENTER] para continuar')
-
-data=0
-jogando=True
-
-poder_p1=0
-poder_p2=0
-vitorias_p1=0
-vitorias_p2=0
-numero_jogos=0
-tecla_apertada=''
-tecla_anterior=''
-
 ascii_art=[
     [
         "",
@@ -192,6 +171,72 @@ ascii_art=[
         "            |__|   |__|",
         ""
     ]]
+
+jogando=True
+poder_p1=0
+poder_p2=0
+vitorias_p1=0
+vitorias_p2=0
+numero_jogos=0
+tecla_apertada=''
+tecla_anterior=''
+
+socketServidor=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+porta1=input("Porta de Entrada(por exemplo 20123): ")
+porta2=input("Porta de Saida(por exemplo 20124): ")
+try:
+    socketServidor.bind(("", porta1))
+    print('Escuta')
+except:
+    socketServidor.bind(("", porta2))
+    print('Escuta Except(algo provavelmente deu errado...)')
+socketCliente=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+IP_visivel=socket.gethostbyname(socket.gethostname())
+data=''
+trava=True
+    
+def conexaoJogadores():
+    global data
+    time.sleep(0.1)
+    while jogando:
+        data,addr=socketServidor.recvfrom(2048)
+
+while 8001:
+    print ('\n Seu IP: '+str(IP_visivel)+' (Feche outras conexoes, como o HAMACHI).')
+    resposta=input('\nEscolha:\n\n 1 : Se conectar\n\n 2 : Esperar\n\n-')
+    if resposta==1:        
+        try:
+            thread.start_new_thread(conexaoJogadores,())
+        except:
+            print "ERRO: nao foi possivel iniciar a comunicacao entre os jogadores."
+        IP_amigo=raw_input('\nQual eh o IP do seu amigo?\n-')
+        while data!='IP':
+            try:
+                socketCliente.sendto(IP_visivel,(IP_amigo,porta2))
+            except:
+                socketCliente.sendto(IP_visivel,(IP_amigo,porta1))
+        break
+    elif resposta==2:
+        print 'ouvindo...'
+        data,addr=socketServidor.recvfrom(1024)
+        IP_amigo=data
+        print(data,addr)
+        print(IP_amigo)
+        try:
+            socketCliente.sendto('IP',(IP_amigo,porta2))
+            print('enviou 1')
+        except:
+            socketCliente.sendto('IP',(IP_amigo,porta1))
+            print('enviou 2')
+        try:
+            thread.start_new_thread(conexaoJogadores,())
+        except:
+            print "ERRO: nao foi possivel iniciar a comunicacao entre os jogadores."
+        break
+    else:
+        print('Digite 1 ou 2!')
+
+
 def desenhaHalterofilistas(jogador,oponente):
     if jogador>9:
         jogador=9
@@ -226,12 +271,6 @@ def verificaVitoria():
     if poder_p2>=100:
         vitorias_p2+=1
         poder_p1=0
-    
-def conexaoJogadores():
-    global data
-    time.sleep(0.1)
-    while jogando:
-        data,addr=socketServidor.recvfrom(2048)
 
 def leituraTeclado():
     global tecla_apertada
@@ -243,11 +282,6 @@ try:
     thread.start_new_thread(leituraTeclado,())
 except:
     print "ERRO: nao foi possivel iniciar a leitura de teclado."
-
-try:
-    thread.start_new_thread(conexaoJogadores,())
-except:
-    print "ERRO: nao foi possivel iniciar a comunicacao entre os jogadores."
 
 try:
     thread.start_new_thread(dissipassaoEnergia,())
@@ -274,7 +308,10 @@ while jogando:
     painelHash("Aperte repetidamente A W D S nesta sequencia para levantar o peso!")
     print "#"+" "*75+"#"
     socketCliente.sendto(str(poder_p1),(IP_amigo,porta2))
-    poder_p2=int(data)
+    try:
+        poder_p2=int(data)
+    except:
+        pass
     print "#"*77+"\n"
     desenhaHalterofilistas(int(poder_p1/10),int(poder_p2/10))
     print "\n"+"#"*77
