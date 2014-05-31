@@ -193,20 +193,13 @@ except:
 socketCliente=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 IP_visivel=socket.gethostbyname(socket.gethostname())
 data=''
-msg=''
-trava=True
+
 
 def conexaoJogadores():
     global data
     time.sleep(0.1)
     while jogando:
-        if trava==True:
-            data,addr=socketServidor.recvfrom(2048)
-        else:
-            if socketServidor.recvfrom(2048)[0]!="IP" and socketServidor.recvfrom(2048)[0]!=IP_amigo:
-                data,addr=socketServidor.recvfrom(2048)
-                time.sleep(0.01)
-                print "Outro Jogador : "+str(data)
+        data,addr=socketServidor.recvfrom(2048)
 
 while 8001:
     print ('\n Seu IP: '+str(IP_visivel)+' (Feche outras conexoes, como o HAMACHI).')
@@ -284,10 +277,7 @@ def leituraTeclado():
     global tecla_apertada
     time.sleep(0.2)
     while jogando:
-        if trava==True:
-            tecla_apertada = str(msvcrt.getch()).lower()
-        else:
-            pass
+        tecla_apertada = str(msvcrt.getch()).lower()
 
 try:
     thread.start_new_thread(leituraTeclado,())
@@ -297,67 +287,47 @@ except:
 def dissipassaoEnergia():
     global poder_p1
     while jogando:
-        if trava==True:
-            time.sleep(0.25)
-            if poder_p1>1:
-                poder_p1-=1
-        else:
-            pass
+        time.sleep(0.25)
+        if poder_p1>1:
+            poder_p1-=1
+
 try:
     thread.start_new_thread(dissipassaoEnergia,())
 except:
     print "ERRO: nao foi possivel iniciar as rotinas periodicas."
 
-
-while 1:
-    trava=False
-    time.sleep(1)
-    os.system('cls')
-    print "#"*45+'\n## Jogadores, para jogar digitem "halteres". ##\n'+"#"*45+'\n'
-    while data!="halteres" and msg!="halteres":
-        msg=raw_input()
-        try:
-            socketCliente.sendto(msg,(IP_amigo,porta2))
-        except:
-            socketCliente.sendto(msg,(IP_amigo,porta1))
-    time.sleep(1)
+time.sleep(1)
+while jogando:
+    time.sleep(1/30)
+    verificaTeclas("a","s")
+    verificaTeclas("w","a")
+    verificaTeclas("d","w")
+    verificaTeclas("s","d")
+    if str(tecla_apertada)=="h":
+        tecla_anterior="h"
+    if str(tecla_apertada)=="q" and tecla_anterior=="h":
+        jogando=False
+    print "#"*77
+    print "#"+" "*75+"#"
+    painelHash("H A L T E R O F I L I S M O")
+    print "#"+" "*75+"#"
+    painelHash("Aperte repetidamente A W D S nesta sequencia para levantar o peso!")
+    print "#"+" "*75+"#"
+    socketCliente.sendto(str(poder_p1),(IP_amigo,porta2))
     try:
-        socketCliente.sendto("halteres",(IP_amigo,porta2))
+        poder_p2=int(data)
     except:
-        socketCliente.sendto("halteres",(IP_amigo,porta1))
-    time.sleep(1)
-    trava=True
-    while jogando:
-        time.sleep(1/30)
-        verificaTeclas("a","s")
-        verificaTeclas("w","a")
-        verificaTeclas("d","w")
-        verificaTeclas("s","d")
-        if str(tecla_apertada)=="h":
-            tecla_anterior="h"
-        if str(tecla_apertada)=="q" and tecla_anterior=="h":
-            jogando=False
-        print "#"*77
-        print "#"+" "*75+"#"
-        painelHash("H A L T E R O F I L I S M O")
-        print "#"+" "*75+"#"
-        painelHash("Aperte repetidamente A W D S nesta sequencia para levantar o peso!")
-        print "#"+" "*75+"#"
-        socketCliente.sendto(str(poder_p1),(IP_amigo,porta2))
-        try:
-            poder_p2=int(data)
-        except:
-            pass
-        print "#"*77+"\n"
-        desenhaHalterofilistas(int(poder_p1/10),int(poder_p2/10))
-        print "\n"+"#"*77
-        painelHalf(" "," ")
-        print "#"+" "*31+"PODER DE LUTA"+" "*31+"#"
-        painelHalf(poder_p1,poder_p2)
-        painelHalf(" "," ")
-        painelHash("De "+str(numero_jogos)+" partidas, venceram:")
-        painelHalf(str(vitorias_p1),str(vitorias_p2))
-        painelHalf(" "," ")
-        print "#"*77
-        verificaVitoria()
-        os.system('cls')
+        pass
+    print "#"*77+"\n"
+    desenhaHalterofilistas(int(poder_p1/10),int(poder_p2/10))
+    print "\n"+"#"*77
+    painelHalf(" "," ")
+    print "#"+" "*31+"PODER DE LUTA"+" "*31+"#"
+    painelHalf(poder_p1,poder_p2)
+    painelHalf(" "," ")
+    painelHash("De "+str(numero_jogos)+" partidas, venceram:")
+    painelHalf(str(vitorias_p1),str(vitorias_p2))
+    painelHalf(" "," ")
+    print "#"*77
+    verificaVitoria()
+    os.system('cls')
