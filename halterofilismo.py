@@ -181,61 +181,60 @@ numero_jogos=0
 tecla_apertada=''
 tecla_anterior=''
 
+resposta=0
+
 socketServidor=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+print("\n"+"Maximize esta janela e ajuste sua largura para 80 caracteres!".center(79)+"\n")
 porta1=input("Porta de Entrada(por exemplo 20123): ")
-porta2=input("Porta de Saida(por exemplo 20124): ")
+porta2=input("Porta de  Saida (por exemplo 20124): ")
 try:
     socketServidor.bind(("", porta1))
-    print('Escuta')
+    print('\n'+'OK'.rjust(79))
 except:
     socketServidor.bind(("", porta2))
-    print('Escuta Except(algo provavelmente deu errado...)')
+    print('\n'+'(Algo provavelmente deu errado, troque de Portas) : NOT OK'.rjust(79))
 socketCliente=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 IP_visivel=socket.gethostbyname(socket.gethostname())
 data=''
 
 
-def conexaoJogadores():
+def conexaoJogadores():#funcao Thread
     global data
     time.sleep(0.1)
     while jogando:
         data,addr=socketServidor.recvfrom(2048)
 
-while 8001:
-    print ('\n Seu IP: '+str(IP_visivel)+' (Feche outras conexoes, como o HAMACHI).')
-    resposta=input('\nEscolha:\n\n 1 : Se conectar\n\n 2 : Esperar\n\n-')
-    if resposta==1:        
+print ('\n Seu IP: '+str(IP_visivel)+' (Feche outras conexoes, como o HAMACHI).\n\nEscolha:\n\n 1 : Se conectar\n\n 2 : Esperar\n')
+while resposta!=1 and resposta!=2:
+    resposta=input('\nDigite 1 ou 2:\n-')
+if resposta==1:        
+    try:
+        thread.start_new_thread(conexaoJogadores,())#inicia Thread se a resposta for 1
+    except:
+        print "ERRO: nao foi possivel iniciar a comunicacao entre os jogadores."
+    IP_amigo=raw_input('\nQual eh o IP do seu amigo?\n-')
+    while data!='IP':
+        time.sleep(1)
         try:
-            thread.start_new_thread(conexaoJogadores,())
+            socketCliente.sendto(IP_visivel,(IP_amigo,porta2))
         except:
-            print "ERRO: nao foi possivel iniciar a comunicacao entre os jogadores."
-        IP_amigo=raw_input('\nQual eh o IP do seu amigo?\n-')
-        while data!='IP':
-            time.sleep(1)
-            try:
-                socketCliente.sendto(IP_visivel,(IP_amigo,porta2))
-            except:
-                socketCliente.sendto(IP_visivel,(IP_amigo,porta1))
-        break
-    elif resposta==2:
-        print 'ouvindo...'
-        data,addr=socketServidor.recvfrom(2048)
-        IP_amigo=data
-        print(data,addr)
-        print(IP_amigo)
-        try:
-            socketCliente.sendto('IP',(IP_amigo,porta2))
-            print('enviou 1')
-        except:
-            socketCliente.sendto('IP',(IP_amigo,porta1))
-            print('enviou 2')
-        try:
-            thread.start_new_thread(conexaoJogadores,())
-        except:
-            print "ERRO: nao foi possivel iniciar a comunicacao entre os jogadores."
-        break
-    else:
-        print('Digite 1 ou 2!')
+            socketCliente.sendto(IP_visivel,(IP_amigo,porta1))#porta except: dara erro.
+if resposta==2:
+    print 'ouvindo...'
+    data,addr=socketServidor.recvfrom(2048)
+    IP_amigo=data
+    print(data,addr)
+    print(IP_amigo)
+    try:
+        socketCliente.sendto('IP',(IP_amigo,porta2))
+        print('enviou 1')
+    except:
+        socketCliente.sendto('IP',(IP_amigo,porta1))#porta except
+        print('enviou 2')
+    try:
+        thread.start_new_thread(conexaoJogadores,())#inicia Thread se a resposta for 2
+    except:
+        print "ERRO: nao foi possivel iniciar a comunicacao entre os jogadores."
 
 def desenhaHalterofilistas(jogador,oponente):
     if jogador>9:
@@ -273,18 +272,18 @@ def painelHalf(texto1, texto2):
 def painelHash(texto):
     print "#"+" "*(38-int(len(str(texto))/2))+str(texto)+" "*(37-int(len(str(texto))/2)-len(str(texto))%2)+"#"
 
-def leituraTeclado():
+def leituraTeclado():#funcao Thread
     global tecla_apertada
     time.sleep(0.2)
     while jogando:
         tecla_apertada = str(msvcrt.getch()).lower()
 
 try:
-    thread.start_new_thread(leituraTeclado,())
+    thread.start_new_thread(leituraTeclado,())#inicia Thread
 except:
     print "ERRO: nao foi possivel iniciar a leitura de teclado."
 
-def dissipassaoEnergia():
+def dissipassaoEnergia():#funcao Thread
     global poder_p1
     while jogando:
         time.sleep(0.25)
@@ -292,7 +291,7 @@ def dissipassaoEnergia():
             poder_p1-=1
 
 try:
-    thread.start_new_thread(dissipassaoEnergia,())
+    thread.start_new_thread(dissipassaoEnergia,())#inicia Thread
 except:
     print "ERRO: nao foi possivel iniciar as rotinas periodicas."
 
