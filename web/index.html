@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Halterofilismo (2014)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.min.css">
+<style>
+  html, body { margin: 0; background: #0c0c0c; color: #c0c0c0; font: 15px/1.5 "Segoe UI", system-ui, sans-serif; }
+  main { max-width: 820px; margin: 0 auto; padding: 20px 16px; }
+  h1 { margin: 0 0 4px; font: 600 24px "Cascadia Mono", Consolas, monospace; color: #f0f0f0; }
+  p { margin: 4px 0 12px; opacity: .8; }
+  .win { border: 1px solid #3a3a3a; border-radius: 6px; overflow: hidden; box-shadow: 0 10px 30px #000a; }
+  .bar { background: #1f1f1f; padding: 6px 10px; font: 12px "Segoe UI", sans-serif; color: #ddd; }
+  #term { padding: 6px; background: #000; overflow-x: auto; }
+  #status { font: 12px monospace; opacity: .6; margin-top: 8px; }
+  a { color: #7fb8ff; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Halterofilismo</h1>
+  <p>Jogo de levantamento de peso para dois jogadores em rede, feito em 2014 para a matéria de Redes: quem apertar <b>A W D S</b> nessa ordem mais rápido levanta a barra primeiro. O original mandava o "poder de luta" de cada um por UDP; aqui o código Python original roda via Pyodide e as mensagens vão por WebRTC.</p><p>As portas que o jogo pede não importam mais (digite quaisquer números). Um jogador escolhe <b>2 (Esperar)</b> e passa o código da sala que o jogo mostra como "Seu IP"; o outro escolhe <b>1 (Se conectar)</b> e digita esse código quando o jogo pedir o IP do amigo. <b>H</b> e depois <b>Q</b> sai.</p>
+  <div class="win"><div class="bar">C:\Python27\python.exe halterofilismo.py</div><div id="term"></div></div>
+  <div id="status">Carregando...</div>
+  <p><a href="https://github.com/fershibli/halterofilismo">Código-fonte</a></p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js"></script>
+<script>window.GAME = { main: 'halterofilismo.py', cols: 80, rows: 40, net: 'halterofilismo' };</script>
+<script src="term.js"></script>
+</body>
+</html>

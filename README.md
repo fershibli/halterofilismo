@@ -6,6 +6,12 @@ A two-player weightlifting game for the Windows console, with ASCII-art lifters,
 
 `Halterofilismo_Redes_1` to `4b` (May-Jun 2014): from the first UDP exchange to win counters, matches and the ASCII animations in `ascii_art_musculacao*.txt`.
 
+## Play in the browser
+
+**[https://fershibli.github.io/halterofilismo/](https://fershibli.github.io/halterofilismo/)** (open it on two computers, or in two tabs)
+
+The page runs `web/game/halterofilismo.py` (a Python 3 copy made with 2to3) on Pyodide inside an xterm.js terminal. `web/green.py` turns the keyboard, energy and network threads into cooperative tasks, since browsers have no threads, and `web/netsock.py` replaces the UDP sockets with a WebRTC data channel (PeerJS). The ports the game asks for no longer matter, and the "IP" it shows and asks for is a room code. Published by `.github/workflows/pages.yml`.
+
 ## Author
 
 Fernando Luiz Neme Chibli ([@fershibli](https://github.com/fershibli))
